@@ -15,7 +15,7 @@ int sh( int argc, char **argv, char **envp ) {
 
   char *prompt = calloc(PROMPTMAX, sizeof(char));
   char *commandline = calloc(MAX_CANON, sizeof(char));
-  char *command, *arg, commandpath[64], *p, *pwd, *owd;
+  char *command, *arg, commandpath[256], *p, *pwd, *owd;
   char **args = calloc(MAXARGS, sizeof(char*));
   int uid, i, status, argsct, go = 1;
   struct passwd *password_entry;
@@ -72,6 +72,7 @@ int sh( int argc, char **argv, char **envp ) {
 		arg = strtok(NULL, " ");
 		i++;
 	}
+	printf("%s", args[2]);
 
     /* check for each built in command and implement */
 	if (!strcmp(command, "exit\n")) {
@@ -161,9 +162,23 @@ int sh( int argc, char **argv, char **envp ) {
 		}
 	}// Adds a new prefix to the prompt, asks for one if none given.
 
-	else if (!strcmp(command, "printev\n")) {
-		//
-	}
+	else if (!strcmp(command, "printenv\n") | !strcmp(command, "printenv")) {
+		pathlist = get_path();
+		if (args[0][0] == '\0') {
+			while(pathlist) {
+				printf("%s\n", pathlist->element);
+				pathlist = pathlist->next;
+			}
+		} else if (args[1][0] != '\0') {
+			printf("printenv: too many arguments.\n");
+		} else {
+			if (getenv(args[0]) != NULL) {
+				strcpy(commandpath, getenv(args[0]));
+				printf("%s\n", commandpath);
+			}
+		}
+	}// Prints environment, narrow to one if given.
+
 	else if (!strcmp(command, "alias\n")) {
 		//
 	}
