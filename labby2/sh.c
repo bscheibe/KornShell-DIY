@@ -15,7 +15,7 @@ int sh( int argc, char **argv, char **envp ) {
 
   char *prompt = calloc(PROMPTMAX, sizeof(char));
   char *commandline = calloc(MAX_CANON, sizeof(char));
-  char *command, *arg, *commandpath, *p, *pwd, *owd;
+  char *command, *arg, commandpath[64], *p, *pwd, *owd;
   char **args = calloc(MAXARGS, sizeof(char*));
   int uid, i, status, argsct, go = 1;
   struct passwd *password_entry;
@@ -53,7 +53,7 @@ int sh( int argc, char **argv, char **envp ) {
 	i = 0;
 	while (arg != NULL) {
 		args[i] = (char*)calloc(strlen(arg) + 1, sizeof(char));
-		strncpy(args[i], arg, strlen(arg));
+		strncpy(args[i], arg, strlen(arg)-1);
 		arg = strtok(NULL, " ");
 		i++;
 	}
@@ -61,26 +61,41 @@ int sh( int argc, char **argv, char **envp ) {
 	if (!strcmp(command, "exit\n")) {
 		return 0;
 	}
-	else if (!strcmp(command, "which\n")) {
-		//
+	if (!strcmp(command, "which")) {
+		pathlist = get_path();
+		while (pathlist) {
+			sprintf(commandpath, "%s/%s", pathlist->element, args[0]);
+			if (access(commandpath, F_OK) == 0) {
+				printf("%s\n", commandpath);
+				break;
+			} 
+			pathlist = pathlist->next;
+		}
 	}
-	else if (!strcmp(command, "where\n")) {
-		//
+	else if (!strcmp(command, "where")) {
+		pathlist = get_path();
+		while (pathlist) {
+			sprintf(commandpath, "%s/%s", pathlist->element, args[0]);
+			if (access(commandpath, F_OK) == 0) {
+				printf("%s\n", commandpath);
+			}
+			pathlist = pathlist->next;
+		}
 	}
 	else if (!strcmp(command, "cd\n")) {
-		//
+		//cd(args);
 	}
 	else if (!strcmp(command, "pwd\n")) {
-		//
+		//pwd(args);
 	}
 	else if (!strcmp(command, "list\n")) {
-		//
+		//list(args);
 	}
 	else if (!strcmp(command, "pid\n")) {
-		//
+		//pid(args);
 	}
 	else if (!strcmp(command, "kill\n")) {
-		//
+		//kill(args);
 	}
 	else if (!strcmp(command, "prompt\n")) {
 		//

@@ -1,5 +1,5 @@
 #include "which.h"
 
-which () {
-
+char* which (char** args) {
+	
 }
