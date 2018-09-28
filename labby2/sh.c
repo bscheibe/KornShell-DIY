@@ -48,20 +48,20 @@ int sh( int argc, char **argv, char **envp ) {
 		printf("\n");
 		continue;
 	}
-	if (!strcmp(commandline, "exit\n")) {
-		return 0;
-	}
-
-	command = strtok(commandline, " ");
+	arg = strtok(commandline, " ");
 	i = 0;
-	while (command != NULL) {
-		command = (strtok(NULL, " ");
-		strcpy(argv[i], command);
+	while (arg != NULL) {
+		args[i] = (char*)calloc(strlen(arg) + 1, sizeof(char));
+		strncpy(args[i], arg, strlen(arg));
+		arg = strtok(NULL, " ");
 		i++;
 	}
-
+	printf(args[0]);
     /* check for each built in command and implement */
-	else if (!strcmp(command, "which\n")) {
+	if (!strcmp(args[0], "exit\n")) {
+		return 0;
+	}
+	if (!strcmp(command, "which\n")) {
 		//
 	}
 	else if (!strcmp(command, "where\n")) {
