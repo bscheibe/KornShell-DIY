@@ -44,57 +44,55 @@ int sh( int argc, char **argv, char **envp ) {
 	printf(" [%s]> ", pwd);
 
     /* get command line and process */
-	if (fgets(commandline, PROMPTMAX, stdin) == NULL) {
-		printf("\n");
-		continue;
-	}
+	fgets(commandline, PROMPTMAX, stdin);
 	if (!strcmp(commandline, "exit\n")) {
 		return 0;
 	}
-
-	command = strtok(commandline, " ");
-	i = 0;
-	while (command != NULL) {
-		command = (strtok(NULL, " ");
-		strcpy(argv[i], command);
-		i++;
-	}
-
     /* check for each built in command and implement */
-	else if (!strcmp(command, "which\n")) {
+	else if (!strcmp(commandline, "which\n")) {
+		//
+	
+	if (!strcmp(commandline, "where\n")) {
 		//
 	}
-	else if (!strcmp(command, "where\n")) {
+
+	if (!strcmp(commandline, "cd\n")) {
 		//
 	}
-	else if (!strcmp(command, "cd\n")) {
+
+	if (!strcmp(commandline, "pwd\n")) {
 		//
 	}
-	else if (!strcmp(command, "pwd\n")) {
+
+	if (!strcmp(commandline, "list\n")) {
 		//
 	}
-	else if (!strcmp(command, "list\n")) {
+
+	if(!strcmp(commandline, "pid\n")) {
 		//
 	}
-	else if (!strcmp(command, "pid\n")) {
+
+	if(!strcmp(commandline, "kill\n")) {
 		//
 	}
-	else if (!strcmp(command, "kill\n")) {
+
+	if(!strcmp(commandline, "prompt\n")) {
 		//
 	}
-	else if (!strcmp(command, "prompt\n")) {
+
+	if (!strcmp(commandline, "printev\n")) {
 		//
 	}
-	else if (!strcmp(command, "printev\n")) {
+
+	if (!strcmp(commandline, "alias\n")) {
 		//
 	}
-	else if (!strcmp(command, "alias\n")) {
+
+	if (!strcmp(commandline, "history\n")) {
 		//
 	}
-	else if (!strcmp(command, "history\n")) {
-		//
-	}
-	else if (!strcmp(command, "setenv\n")) {
+
+	if (!strcmp (commandline, "setenv\n")) {
 		//
 	}
 
