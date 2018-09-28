@@ -48,7 +48,8 @@ int sh( int argc, char **argv, char **envp ) {
 		printf("\n");
 		continue;
 	}
-	arg = strtok(commandline, " ");
+	command = strtok(commandline, " ");
+	arg = strtok(NULL, " ");
 	i = 0;
 	while (arg != NULL) {
 		args[i] = (char*)calloc(strlen(arg) + 1, sizeof(char));
@@ -56,45 +57,44 @@ int sh( int argc, char **argv, char **envp ) {
 		arg = strtok(NULL, " ");
 		i++;
 	}
-	printf(args[0]);
     /* check for each built in command and implement */
-	if (!strcmp(args[0], "exit\n")) {
+	if (!strcmp(command, "exit\n")) {
 		return 0;
 	}
-	if (!strcmp(args[0], "which\n")) {
+	else if (!strcmp(command, "which\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "where\n")) {
+	else if (!strcmp(command, "where\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "cd\n")) {
+	else if (!strcmp(command, "cd\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "pwd\n")) {
+	else if (!strcmp(command, "pwd\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "list\n")) {
+	else if (!strcmp(command, "list\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "pid\n")) {
+	else if (!strcmp(command, "pid\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "kill\n")) {
+	else if (!strcmp(command, "kill\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "prompt\n")) {
+	else if (!strcmp(command, "prompt\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "printev\n")) {
+	else if (!strcmp(command, "printev\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "alias\n")) {
+	else if (!strcmp(command, "alias\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "history\n")) {
+	else if (!strcmp(command, "history\n")) {
 		//
 	}
-	else if (!strcmp(args[0], "setenv\n")) {
+	else if (!strcmp(command, "setenv\n")) {
 		//
 	}
 
