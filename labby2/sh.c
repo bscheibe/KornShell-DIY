@@ -48,7 +48,7 @@ int sh( int argc, char **argv, char **envp ) {
 
   while (go) {
     /* print your prompt */
-	printf(" [%s]> ", pwd);
+	printf("%s [%s]> ", prompt, pwd);
 
     	// Read in our input.
 	if (fgets(commandline, PROMPTMAX, stdin) == NULL) {
@@ -120,18 +120,47 @@ int sh( int argc, char **argv, char **envp ) {
 		printf("%s\n", pwd);
 	}// Print the working directory.
 
-	else if (!strcmp(command, "list\n")) {
-		//list(args);
-	}
+	else if (!strcmp(command, "list\n") | !strcmp(command, "list")) {
+		DIR *dir;
+		struct dirent *file;
+
+		if (args[0][0] == '\0') {
+			dir = opendir(pwd);
+		} else {
+			dir = opendir(args[0]);
+		}
+		while ((file = readdir(dir)) != NULL) {
+			printf("%s\n", file->d_name);
+		}
+		closedir(dir);
+	}// Lists files in the given directory, lists files in current if none given.
+
 	else if (!strcmp(command, "pid\n")) {
-		//pid(args);
-	}
-	else if (!strcmp(command, "kill\n")) {
-		//kill(args);
-	}
-	else if (!strcmp(command, "prompt\n")) {
-		//
-	}
+		printf("%d\n", (int) getpid());
+	}// Prints the shell's process ID.
+
+	else if (!strcmp(command, "kill")) {
+		int val0 = atoi(args[0]);
+		int val1 = atoi(args[1]);
+		printf("%d, %d", val0, val1);
+		if (val0 < 0) {
+			kill(val1, val0);
+		} else {
+			printf("Defaulting.");
+			kill(val0, SIGTERM);
+		}
+	}// Sends a signal to the process with a given PID. Defaults to SIGTERM.
+
+	else if (!strcmp(command, "prompt\n") | !strcmp(command, "prompt")) {
+		if (args[0][0] == '\0') {
+			printf("Input prompt prefix: ");
+			fgets(prompt, PROMPTMAX, stdin);
+			prompt[strcspn(prompt, "\n")] = 0;
+		} else {
+			sprintf(prompt, "%s", args[0]);
+		}
+	}// Adds a new prefix to the prompt, asks for one if none given.
+
 	else if (!strcmp(command, "printev\n")) {
 		//
 	}
