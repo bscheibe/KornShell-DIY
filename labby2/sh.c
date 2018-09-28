@@ -38,29 +38,46 @@ int sh( int argc, char **argv, char **envp ) {
 
   /* Put PATH into a linked list */
   pathlist = get_path();
+  i = 0;
+
+  // Allocate our strings.
+  while (i < MAXARGS) {
+	args[i] = (char*)calloc(32, sizeof(char));
+	i++;
+  }
 
   while (go) {
     /* print your prompt */
 	printf(" [%s]> ", pwd);
 
-    /* get command line and process */
+    	// Read in our input.
 	if (fgets(commandline, PROMPTMAX, stdin) == NULL) {
 		printf("\n");
 		continue;
 	}
+
+	// Clear our argument array.
+	i = 0;
+	while (i < MAXARGS) {
+		memset(args[i], 0, 32);
+		i++;
+	}
+
+	// Parse our input.
 	command = strtok(commandline, " ");
 	arg = strtok(NULL, " ");
 	i = 0;
 	while (arg != NULL) {
-		args[i] = (char*)calloc(strlen(arg) + 1, sizeof(char));
-		strncpy(args[i], arg, strlen(arg)-1);
+		strncpy(args[i], arg, strlen(arg) - 1);
 		arg = strtok(NULL, " ");
 		i++;
 	}
+
     /* check for each built in command and implement */
 	if (!strcmp(command, "exit\n")) {
 		return 0;
-	}
+	}// Return for our exit command.
+
 	if (!strcmp(command, "which")) {
 		pathlist = get_path();
 		while (pathlist) {
@@ -68,10 +85,11 @@ int sh( int argc, char **argv, char **envp ) {
 			if (access(commandpath, F_OK) == 0) {
 				printf("%s\n", commandpath);
 				break;
-			} 
+			}
 			pathlist = pathlist->next;
 		}
-	}
+	}// Search for a command and print the first match we find.
+
 	else if (!strcmp(command, "where")) {
 		pathlist = get_path();
 		while (pathlist) {
@@ -81,13 +99,27 @@ int sh( int argc, char **argv, char **envp ) {
 			}
 			pathlist = pathlist->next;
 		}
-	}
-	else if (!strcmp(command, "cd\n")) {
-		//cd(args);
-	}
+	}// Search for a command and print all matches.
+
+	else if (!strcmp(command, "cd") | !strcmp(command, "cd\n")) {
+		if (args[0][0] == '\0') {
+			chdir(homedir);
+			strcpy(owd, pwd);
+		} else if (args[0][0] == '-') {
+			chdir(owd);
+			strcpy(owd, pwd);
+		} else {
+			strcpy(owd, pwd);
+			sprintf(pwd, "%s/%s", pwd, args[0]);
+			chdir(pwd);
+		}
+		pwd = getcwd(NULL, PATH_MAX + 1);
+	}// Change directory, to home if blank, to last if '-', and to named if given.
+
 	else if (!strcmp(command, "pwd\n")) {
-		//pwd(args);
-	}
+		printf("%s\n", pwd);
+	}// Print the working directory.
+
 	else if (!strcmp(command, "list\n")) {
 		//list(args);
 	}
