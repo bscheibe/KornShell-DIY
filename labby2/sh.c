@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include "sh.h"
+#include "alias.h"
 
 int sh( int argc, char **argv, char **envp ) {
 
@@ -21,6 +22,8 @@ int sh( int argc, char **argv, char **envp ) {
   struct passwd *password_entry;
   char *homedir;
   struct pathelement *pathlist;
+  struct alias *firstalias = NULL;
+  struct alias *lastalias;
 
   uid = getuid();
   password_entry = getpwuid(uid);               /* get passwd info */
@@ -64,18 +67,45 @@ int sh( int argc, char **argv, char **envp ) {
 	}
 
 	// Parse our input.
+	char input[MAX_CANON];
+	strcpy(input, commandline);
+
+	// Check for alias usage.
+	alias *ch = firstalias;
+	while (ch != NULL) {
+		if (!strncmp(commandline, ch->replacement, strlen(ch->replacement)-1)) {
+			strcpy(commandpath, &commandline[strlen(ch->replacement)]);
+			strcpy(&commandline[strlen(ch->string)], command);
+			snprintf(commandline, 256, "%s %s", ch->string, commandpath);
+		}
+		ch = ch->next;
+	}// Check the first portion of the string for an alias and replace.
+	// printf(",%s,", commandline);
+
 	command = strtok(commandline, " ");
 	arg = strtok(NULL, " ");
 	i = 0;
 	while (arg != NULL) {
-		strncpy(args[i], arg, strlen(arg) - 1);
+		strncpy(args[i], arg, strlen(arg));
 		arg = strtok(NULL, " ");
 		i++;
 	}
-	printf("%s", args[2]);
+	if (i > 0) {
+		args[i-1][strlen(args[i-1])-1] = '\0';
+	}
 
     /* check for each built in command and implement */
-	if (!strcmp(command, "exit\n")) {
+	if (!strcmp(command, "exit\n") | !strcmp(command, "exit")) {
+		// Make our free calls.
+		alias *al = firstalias;
+		alias *temp;
+		while (al != NULL) {
+			temp = al->next;
+			free(al->string);
+			free(al->replacement);
+			free(al);
+			al = temp;
+		}
 		return 0;
 	}// Return for our exit command.
 
@@ -95,6 +125,7 @@ int sh( int argc, char **argv, char **envp ) {
 		pathlist = get_path();
 		while (pathlist) {
 			sprintf(commandpath, "%s/%s", pathlist->element, args[0]);
+			commandpath[strlen(commandpath)] = 0;
 			if (access(commandpath, F_OK) == 0) {
 				printf("%s\n", commandpath);
 			}
@@ -117,7 +148,7 @@ int sh( int argc, char **argv, char **envp ) {
 		pwd = getcwd(NULL, PATH_MAX + 1);
 	}// Change directory, to home if blank, to last if '-', and to named if given.
 
-	else if (!strcmp(command, "pwd\n")) {
+	else if (!strcmp(command, "pwd\n") | !strcmp(command, "pwd")) {
 		printf("%s\n", pwd);
 	}// Print the working directory.
 
@@ -179,9 +210,31 @@ int sh( int argc, char **argv, char **envp ) {
 		}
 	}// Prints environment, narrow to one if given.
 
-	else if (!strcmp(command, "alias\n")) {
-		//
-	}
+	else if (!strcmp(command, "alias") | !strcmp(command, "alias\n")) {
+		if (args[0][0] == '\0') {
+			alias *al = firstalias;
+			while (al != NULL) {
+				printf("%s, aliased as %s", al->string, al->replacement);
+				al = al->next;
+			}
+		} else {
+			if (firstalias == NULL) {
+				firstalias = malloc(sizeof(alias));
+				lastalias = firstalias;
+				firstalias->string = (char*)malloc(64*sizeof(char));
+				firstalias->replacement = (char*)malloc(64*sizeof(char));
+			} else {
+				lastalias->next = malloc(sizeof(alias));
+				lastalias = lastalias->next;
+				lastalias->string = (char*)malloc(64*sizeof(char));
+				lastalias->replacement = (char*)malloc(64*sizeof(char));
+				}
+			memcpy(lastalias->replacement, &input[2+strlen(command)+strlen(args[0])], 
+				 (1+strlen(input)-(strlen(command)+strlen(args[0]))));
+			strncpy(lastalias->string, args[0],1+strlen(args[0]));
+		}// Substring our input for aliasing and add a new alias with that value.
+	} // Creates an alias and stores it. Prints alias list if none given.
+
 	else if (!strcmp(command, "history\n")) {
 		//
 	}
