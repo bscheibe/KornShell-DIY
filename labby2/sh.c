@@ -271,7 +271,22 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Prints out recent commands. Defaults to 10, can be given a different value.
 
 	else if (!strcmp(command, "setenv\n")) {
-		
+		pathlist = get_path();
+		if (args[0][0] == '\0') {
+			while(pathlist) {
+				printf("%s\n", pathlist->element);
+				pathlist = pathlist->next;
+			}
+		} else if (args[2][0] != '\0') {
+			printf("setenv: too many arguments.\n");
+		} else if (args[1][0] != '\0') {
+			if (getenv(args[0]) != NULL) {
+				strcpy(commandpath, getenv(args[0]));
+				printf("%s\n", commandpath);
+			}
+		} else {
+			//one arg
+		}
 	}
 
      /*  else  program to exec */
