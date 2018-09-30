@@ -11,6 +11,7 @@
 #include <signal.h>
 #include "sh.h"
 #include "alias.h"
+#include "history.h"
 
 int sh( int argc, char **argv, char **envp ) {
 
@@ -24,6 +25,7 @@ int sh( int argc, char **argv, char **envp ) {
   struct pathelement *pathlist;
   struct alias *firstalias = NULL;
   struct alias *lastalias;
+  struct history *firsthistory = NULL;
 
   uid = getuid();
   password_entry = getpwuid(uid);               /* get passwd info */
@@ -59,6 +61,17 @@ int sh( int argc, char **argv, char **envp ) {
 		continue;
 	}
 
+	// Add to, or create, our history.
+	struct history *temp = malloc(sizeof(history));
+	temp->command = (char*)malloc(PROMPTMAX * sizeof(char));
+	strcpy(temp->command, commandline);
+	if (firsthistory == NULL) {
+		firsthistory = temp;
+	} else {
+		temp->next = firsthistory;
+		firsthistory = temp;
+	}
+
 	// Clear our argument array.
 	i = 0;
 	while (i < MAXARGS) {
@@ -80,7 +93,6 @@ int sh( int argc, char **argv, char **envp ) {
 		}
 		ch = ch->next;
 	}// Check the first portion of the string for an alias and replace.
-	// printf(",%s,", commandline);
 
 	command = strtok(commandline, " ");
 	arg = strtok(NULL, " ");
@@ -99,12 +111,19 @@ int sh( int argc, char **argv, char **envp ) {
 		// Make our free calls.
 		alias *al = firstalias;
 		alias *temp;
+		history *hist = firsthistory;
 		while (al != NULL) {
 			temp = al->next;
 			free(al->string);
 			free(al->replacement);
 			free(al);
 			al = temp;
+		}
+		while (hist != NULL) {
+			hist = firsthistory->next;
+			free(firsthistory->command);
+			free(firsthistory);
+			firsthistory = hist;
 		}
 		return 0;
 	}// Return for our exit command.
@@ -235,11 +254,24 @@ int sh( int argc, char **argv, char **envp ) {
 		}// Substring our input for aliasing and add a new alias with that value.
 	} // Creates an alias and stores it. Prints alias list if none given.
 
-	else if (!strcmp(command, "history\n")) {
-		//
-	}
+	else if (!strcmp(command, "history\n") | !strcmp(command, "history")) {
+		history *hist = firsthistory->next;
+		int amount;
+		i = 0;
+		if (args[0][0] == '\0') {
+			amount = 10;
+		} else {
+			amount = atoi(args[0]);
+		}
+		while ((i < amount) && (hist != NULL)) {
+			printf("%s", hist->command);
+			hist = hist->next;
+			i++;
+		}
+	}// Prints out recent commands. Defaults to 10, can be given a different value.
+
 	else if (!strcmp(command, "setenv\n")) {
-		//
+		
 	}
 
      /*  else  program to exec */
@@ -247,10 +279,9 @@ int sh( int argc, char **argv, char **envp ) {
        /* find it */
        /* do fork(), execve() and waitpid() */
 //
-//    else
-//    fprintf(stderr, "%s: Command not found.\n", args[0]);
-// }
-//	printf("\n");
+	else {
+//		fprintf(stderr, "%s: Command not found.\n", args[0]);
+	}
   }
   return 0;
 } /* sh() */
