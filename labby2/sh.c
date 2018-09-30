@@ -290,12 +290,15 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Sets environment variables, or reas them if none given. Rejects more than two args.
 
      /*  else  program to exec */
-	else if ( !strncmp(command, "/", 1) | !strncmp(command, "./", 2) | !strncmp(command, "../", 3)) { 
-       /* find it */
+	else { //(which(command) | !strncmp(command, "/", 1) | !strncmp(command, "./", 2) | !strncmp(command, "../", 3)) { 
 		if (args[1] == NULL) {
 			command[strlen(command)-1] = '\0';
 		}
 		pathlist = get_path();
+		if (which(command)) {
+			strcpy(command, which(command, pathlist));
+		}
+		printf(",%s,", command);
 		if (!access(command, F_OK)) {
 			pid_t childid = fork();
 			int status;
@@ -328,9 +331,15 @@ int sh( int argc, char **argv, char **envp ) {
 } /* sh() */
 
 char *which(char *command, struct pathelement *pathlist ) {
-   /* loop through pathlist until finding command and return it.  Return
-   NULL when not found. */
-
+	while (pathlist) {
+		sprintf(command, "%s/%s", pathlist->element, args[0]);
+		if (access(command, F_OK) == 0) {
+			return(command);
+			break;
+		}
+		pathlist = pathlist->next;
+	}
+	return NULL;
 } /* which() */
 
 char *where(char *command, struct pathelement *pathlist ) {
