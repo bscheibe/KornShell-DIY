@@ -270,7 +270,7 @@ int sh( int argc, char **argv, char **envp ) {
 		}
 	}// Prints out recent commands. Defaults to 10, can be given a different value.
 
-	else if (!strcmp(command, "setenv\n")) {
+	else if (!strcmp(command, "setenv\n") | !strcmp(command, "setenv")) {
 		pathlist = get_path();
 		if (args[0][0] == '\0') {
 			while(pathlist) {
@@ -280,14 +280,15 @@ int sh( int argc, char **argv, char **envp ) {
 		} else if (args[2][0] != '\0') {
 			printf("setenv: too many arguments.\n");
 		} else if (args[1][0] != '\0') {
-			if (getenv(args[0]) != NULL) {
-				strcpy(commandpath, getenv(args[0]));
-				printf("%s\n", commandpath);
+			if (!strcmp("HOME", args[0])){
+				strcpy(homedir, args[1]);
+			} else {
+				setenv(args[0], args[1], 1);
 			}
 		} else {
-			//one arg
+			setenv(args[0], "", 1);
 		}
-	}
+	}// Sets environment variables, or reas them if none given. Rejects more than two args.
 
      /*  else  program to exec */
 //	}
