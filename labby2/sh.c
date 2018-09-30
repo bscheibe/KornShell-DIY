@@ -43,13 +43,9 @@ int sh( int argc, char **argv, char **envp ) {
 
   /* Put PATH into a linked list */
   pathlist = get_path();
-  i = 0;
 
   // Allocate our strings.
-  while (i < MAXARGS) {
-	args[i] = (char*)calloc(32, sizeof(char));
-	i++;
-  }
+  args[0] = (char*)calloc(32, sizeof(char));
 
   while (go) {
     /* print your prompt */
@@ -73,9 +69,10 @@ int sh( int argc, char **argv, char **envp ) {
 	}
 
 	// Clear our argument array.
-	i = 0;
+	memset(args[0], 32, '0');
+	i = 1;
 	while (i < MAXARGS) {
-		memset(args[i], 0, 32);
+		free(args[i]);
 		i++;
 	}
 
@@ -95,9 +92,11 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Check the first portion of the string for an alias and replace.
 
 	command = strtok(commandline, " ");
+	strcpy(args[0], command);
 	arg = strtok(NULL, " ");
-	i = 0;
+	i = 1;
 	while (arg != NULL) {
+		args[i] = (char*)malloc(32*sizeof(char));
 		strncpy(args[i], arg, strlen(arg));
 		arg = strtok(NULL, " ");
 		i++;
@@ -122,7 +121,7 @@ int sh( int argc, char **argv, char **envp ) {
 		while (hist != NULL) {
 			hist = firsthistory->next;
 			free(firsthistory->command);
-			free(firsthistory);
+//			free(firsthistory);
 			firsthistory = hist;
 		}
 		return 0;
@@ -291,10 +290,36 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Sets environment variables, or reas them if none given. Rejects more than two args.
 
      /*  else  program to exec */
-//	}
+	else if ( !strncmp(command, "/", 1) | !strncmp(command, "./", 2) | !strncmp(command, "../", 3)) { 
        /* find it */
+		if (args[1] == NULL) {
+			command[strlen(command)-1] = '\0';
+		}
+		pathlist = get_path();
+		if (!access(command, F_OK)) {
+			pid_t childid = fork();
+			int status;
+			if (childid == 0) {
+	//			printf("Child, id: %d", childid);
+	//			return(0);
+	//			pathlist = get_path();
+	//			i = 0;
+	//			while (pathlist) {
+	//				environ[i] = pathlist->element;
+	//				printf("%s", environ[i]);
+	//				pathlist = pathlist->next;
+	//				i++;
+	//			}
+	//			if (args[1][0] == 
+				chdir(pwd);
+				execv(args[0], args);
+				return(0);
+			}
+			int wait = waitpid(childid, &status, 0);
+		}
        /* do fork(), execve() and waitpid() */
-//
+	}// Check for an executable, and run if it exists.
+
 	else {
 //		fprintf(stderr, "%s: Command not found.\n", args[0]);
 	}
