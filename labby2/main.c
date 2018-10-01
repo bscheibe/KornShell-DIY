@@ -22,6 +22,6 @@ void sig_handler(int signal) {
 //	printf("\n");
   }
   else if (signal == SIGCLD) {
-	printf("\n Caught signal %d.", signal);
+//	printf("\n Caught signal %d.", signal);
   }
 }

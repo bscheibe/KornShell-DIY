@@ -31,6 +31,7 @@ int sh( int argc, char **argv, char **envp ) {
   password_entry = getpwuid(uid);               /* get passwd info */
   homedir = password_entry->pw_dir;		/* Home directory to start
 						  out with*/
+  setenv("TEST", "testing", 1);
 
   if ((pwd = getcwd(NULL, PATH_MAX+1)) == NULL ) {
     perror("getcwd");
@@ -73,6 +74,7 @@ int sh( int argc, char **argv, char **envp ) {
 	i = 1;
 	while (i < MAXARGS) {
 		free(args[i]);
+		args[i] = NULL;
 		i++;
 	}
 
@@ -87,6 +89,7 @@ int sh( int argc, char **argv, char **envp ) {
 			strcpy(commandpath, &commandline[strlen(ch->replacement)]);
 			strcpy(&commandline[strlen(ch->string)], command);
 			snprintf(commandline, 256, "%s %s", ch->string, commandpath);
+			sprintf(args[0], "%s", ch->string);
 		}
 		ch = ch->next;
 	}// Check the first portion of the string for an alias and replace.
@@ -107,6 +110,7 @@ int sh( int argc, char **argv, char **envp ) {
 
     /* check for each built in command and implement */
 	if (!strcmp(command, "exit\n") | !strcmp(command, "exit")) {
+		return 0;
 		// Make our free calls.
 		alias *al = firstalias;
 		alias *temp;
@@ -127,10 +131,16 @@ int sh( int argc, char **argv, char **envp ) {
 		return 0;
 	}// Return for our exit command.
 
-	if (!strcmp(command, "which")) {
+	if (!strcmp(command, "which") | !strcmp(command, "which\n")) {
+		if (args[1] == NULL) {
+			continue;
+		}
+	//	if (args[2] != NULL) {
+	//		continue;
+	//	}
 		pathlist = get_path();
 		while (pathlist) {
-			sprintf(commandpath, "%s/%s", pathlist->element, args[0]);
+			sprintf(commandpath, "%s/%s", pathlist->element, args[1]);
 			if (access(commandpath, F_OK) == 0) {
 				printf("%s\n", commandpath);
 				break;
@@ -139,10 +149,16 @@ int sh( int argc, char **argv, char **envp ) {
 		}
 	}// Search for a command and print the first match we find.
 
-	else if (!strcmp(command, "where")) {
+	else if (!strcmp(command, "where") | !strcmp(command, "where\n")) {
+		if (args[1] == NULL) {
+			continue;
+		}
+		if (args[2] != NULL) {
+			continue;
+		}
 		pathlist = get_path();
 		while (pathlist) {
-			sprintf(commandpath, "%s/%s", pathlist->element, args[0]);
+			sprintf(commandpath, "%s/%s", pathlist->element, args[1]);
 			commandpath[strlen(commandpath)] = 0;
 			if (access(commandpath, F_OK) == 0) {
 				printf("%s\n", commandpath);
@@ -152,15 +168,15 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Search for a command and print all matches.
 
 	else if (!strcmp(command, "cd") | !strcmp(command, "cd\n")) {
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			chdir(homedir);
 			strcpy(owd, pwd);
-		} else if (args[0][0] == '-') {
+		} else if (args[1][0] == '-') {
 			chdir(owd);
 			strcpy(owd, pwd);
 		} else {
 			strcpy(owd, pwd);
-			sprintf(pwd, "%s/%s", pwd, args[0]);
+			sprintf(pwd, "%s/%s", pwd, args[1]);
 			chdir(pwd);
 		}
 		pwd = getcwd(NULL, PATH_MAX + 1);
@@ -174,10 +190,10 @@ int sh( int argc, char **argv, char **envp ) {
 		DIR *dir;
 		struct dirent *file;
 
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			dir = opendir(pwd);
 		} else {
-			dir = opendir(args[0]);
+			dir = opendir(args[1]);
 		}
 		while ((file = readdir(dir)) != NULL) {
 			printf("%s\n", file->d_name);
@@ -190,10 +206,14 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Prints the shell's process ID.
 
 	else if (!strcmp(command, "kill")) {
-		int val0 = atoi(args[0]);
-		int val1 = atoi(args[1]);
-		printf("%d, %d", val0, val1);
-		if (val0 < 0) {
+		int chk = 2;
+		int val0 = atoi(args[1]);
+		int val1;
+		if (args[2] != NULL) {
+			chk = 1;
+			int val1 = atoi(args[2]);
+		}
+		if ((val0 < 0) && chk) {
 			kill(val1, val0);
 		} else {
 			printf("Defaulting.");
@@ -202,34 +222,34 @@ int sh( int argc, char **argv, char **envp ) {
 	}// Sends a signal to the process with a given PID. Defaults to SIGTERM.
 
 	else if (!strcmp(command, "prompt\n") | !strcmp(command, "prompt")) {
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			printf("Input prompt prefix: ");
 			fgets(prompt, PROMPTMAX, stdin);
 			prompt[strcspn(prompt, "\n")] = 0;
 		} else {
-			sprintf(prompt, "%s", args[0]);
+			sprintf(prompt, "%s", args[1]);
 		}
 	}// Adds a new prefix to the prompt, asks for one if none given.
 
 	else if (!strcmp(command, "printenv\n") | !strcmp(command, "printenv")) {
 		pathlist = get_path();
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			while(pathlist) {
 				printf("%s\n", pathlist->element);
 				pathlist = pathlist->next;
 			}
-		} else if (args[1][0] != '\0') {
+		} else if (args[2] != NULL) {
 			printf("printenv: too many arguments.\n");
 		} else {
-			if (getenv(args[0]) != NULL) {
-				strcpy(commandpath, getenv(args[0]));
+			if (getenv(args[1]) != NULL) {
+				strcpy(commandpath, getenv(args[1]));
 				printf("%s\n", commandpath);
 			}
 		}
 	}// Prints environment, narrow to one if given.
 
 	else if (!strcmp(command, "alias") | !strcmp(command, "alias\n")) {
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			alias *al = firstalias;
 			while (al != NULL) {
 				printf("%s, aliased as %s", al->string, al->replacement);
@@ -247,9 +267,9 @@ int sh( int argc, char **argv, char **envp ) {
 				lastalias->string = (char*)malloc(64*sizeof(char));
 				lastalias->replacement = (char*)malloc(64*sizeof(char));
 				}
-			memcpy(lastalias->replacement, &input[2+strlen(command)+strlen(args[0])], 
-				 (1+strlen(input)-(strlen(command)+strlen(args[0]))));
-			strncpy(lastalias->string, args[0],1+strlen(args[0]));
+			memcpy(lastalias->replacement, &input[2+strlen(command)+strlen(args[1])], 
+				 (1+strlen(input)-(strlen(command)+strlen(args[1]))));
+			strncpy(lastalias->string, args[1],1+strlen(args[1]));
 		}// Substring our input for aliasing and add a new alias with that value.
 	} // Creates an alias and stores it. Prints alias list if none given.
 
@@ -257,10 +277,10 @@ int sh( int argc, char **argv, char **envp ) {
 		history *hist = firsthistory->next;
 		int amount;
 		i = 0;
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			amount = 10;
 		} else {
-			amount = atoi(args[0]);
+			amount = atoi(args[1]);
 		}
 		while ((i < amount) && (hist != NULL)) {
 			printf("%s", hist->command);
@@ -271,23 +291,24 @@ int sh( int argc, char **argv, char **envp ) {
 
 	else if (!strcmp(command, "setenv\n") | !strcmp(command, "setenv")) {
 		pathlist = get_path();
-		if (args[0][0] == '\0') {
+		if (args[1] == NULL) {
 			while(pathlist) {
 				printf("%s\n", pathlist->element);
 				pathlist = pathlist->next;
 			}
-		} else if (args[2][0] != '\0') {
+		} else if (args[3] != NULL) {
 			printf("setenv: too many arguments.\n");
-		} else if (args[1][0] != '\0') {
-			if (!strcmp("HOME", args[0])){
-				strcpy(homedir, args[1]);
+		} else if (args[2] != NULL) {
+			if (!strcmp("HOME", args[1])){
+				strcpy(homedir, args[2]);
 			} else {
-				setenv(args[0], args[1], 1);
+				setenv(args[1], args[2], 1);
 			}
 		} else {
-			setenv(args[0], "", 1);
+			printf("%s", args[1]);
+			setenv(args[1], "", 1);
 		}
-	}// Sets environment variables, or reas them if none given. Rejects more than two args.
+	}// Sets environment variables, or reads them if none given. Rejects more than two args.
 
      /*  else  program to exec */
 	else { //(which(command) | !strncmp(command, "/", 1) | !strncmp(command, "./", 2) | !strncmp(command, "../", 3)) { 
@@ -295,47 +316,32 @@ int sh( int argc, char **argv, char **envp ) {
 			command[strlen(command)-1] = '\0';
 		}
 		pathlist = get_path();
-		if (which(command)) {
-			strcpy(command, which(command, pathlist));
-		}
-		printf(",%s,", command);
-		if (!access(command, F_OK)) {
+		which(command, pathlist);
+		if (!access(command, X_OK)) {
 			pid_t childid = fork();
 			int status;
 			if (childid == 0) {
-	//			printf("Child, id: %d", childid);
-	//			return(0);
-	//			pathlist = get_path();
-	//			i = 0;
-	//			while (pathlist) {
-	//				environ[i] = pathlist->element;
-	//				printf("%s", environ[i]);
-	//				pathlist = pathlist->next;
-	//				i++;
-	//			}
-	//			if (args[1][0] == 
 				chdir(pwd);
-				execv(args[0], args);
+				execv(command, args);
 				return(0);
 			}
 			int wait = waitpid(childid, &status, 0);
-		}
-       /* do fork(), execve() and waitpid() */
-	}// Check for an executable, and run if it exists.
-
-	else {
-//		fprintf(stderr, "%s: Command not found.\n", args[0]);
-	}
+		} else {
+			fprintf(stderr, "%s: Command not found.\n", args[0]);
+		}// Serach for an executable, and run it if it exists.
+  	}
   }
   return 0;
 } /* sh() */
 
 char *which(char *command, struct pathelement *pathlist ) {
+	char temp[256];
 	while (pathlist) {
-		sprintf(command, "%s/%s", pathlist->element, args[0]);
-		if (access(command, F_OK) == 0) {
-			return(command);
-			break;
+		sprintf(temp, "%s/%s", pathlist->element, command);
+		if (access(temp, X_OK) == 0) {
+			sprintf(command, "%s", temp);
+			return NULL;
+//			return(command);
 		}
 		pathlist = pathlist->next;
 	}
