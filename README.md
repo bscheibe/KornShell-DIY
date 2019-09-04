@@ -25,9 +25,9 @@ A personal implementation of the KornShell.
 Refactor bloated main method.  
 Remove global variables.  
 Refactor commands to a separate file.  
-Refactor all commands for clarity and improve upon them.
+Refactor all commands for clarity and improve upon them.  
 Plug memory leaks, if any.  
-Currently includes a provided get_path.c file, write our own instead.
-Add test cases and testing directory.
-Update Makefile for clarity and add automatic testing.
-Refactor file structure for clarity.
+Currently includes a provided get_path.c file, write our own instead.  
+Add test cases and testing directory.  
+Update Makefile for clarity and add automatic testing.  
+Refactor file structure for clarity.  
