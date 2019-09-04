@@ -31,3 +31,6 @@ Currently includes a provided get_path.c file, write our own instead.
 Add test cases and testing directory.  
 Update Makefile for clarity and add automatic testing.  
 Refactor file structure for clarity.  
+Add wildcard support.
+Add piping.
+Add the additional commands : grep.
