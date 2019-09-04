@@ -26,3 +26,4 @@ Refactor bloated main method.
 Remove global variables.  
 Refactor commands to a separate file.  
 Plug memory leaks, if any.  
+Currently includes a provided get_path.c file, write our own instead.
