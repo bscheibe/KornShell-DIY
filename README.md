@@ -22,15 +22,16 @@ A personal implementation of the KornShell.
 
 ## TODO
 
-Refactor bloated main method.  
-Remove global variables.  
-Refactor commands to a separate file.  
+DONE: Ensure existing commands function.
+DONE: Remove global variables.  
+Refactor commands to a separate file as function calls.  
 Refactor all commands for clarity and improve upon them.  
+Refactor bloated main method.  
 Plug memory leaks, if any.  
-Currently includes a provided get_path.c file, write our own instead.  
-Add test cases and testing directory.  
-Update Makefile for clarity and add automatic testing.  
-Refactor file structure for clarity.  
+DONE: Currently includes a provided get_path.c file, write our own instead.  
+(1/2): Add test cases and testing directory.  
+DONE: Update Makefile for clarity and add automatic testing.  
+DONE: Refactor file structure for clarity.  
 Add wildcard support.  
 Add piping.  
-Add the additional commands : grep.  
+Add some additional commands : grep.  
