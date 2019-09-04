@@ -12,6 +12,8 @@
 #include "sh.h"
 #include "alias.h"
 #include "history.h"
+#include "commands.h"
+#include "get_path.h"
 
 int sh( int argc, char **argv, char **envp ) {
 

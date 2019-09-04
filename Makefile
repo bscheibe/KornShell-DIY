@@ -2,15 +2,15 @@
 CC=gcc
 #CC=gcc -Wall
 
-mysh: sh.o get_path.o main.c 
-	$(CC) -g main.c sh.o get_path.o -o mysh
-#	$(CC) -g main.c sh.o get_path.o bash_getcwd.o -o mysh
+myshell: sh.o commands.o src/main.c 
+	$(CC) -g src/main.c sh.o commands.o -o myshell
+#	$(CC) -g src/main.c sh.o commands.o bash_getcwd.o -o myshell
 
-sh.o: sh.c sh.h
-	$(CC) -g -c sh.c
+sh.o: ./src/sh.c src/sh.h
+	$(CC) -g -c src/sh.c
 
-get_path.o: get_path.c get_path.h
-	$(CC) -g -c get_path.c
+commands.o: ./src/commands.c ./src/commands.h
+	$(CC) -g -c ./src/commands.c
 
 clean:
-	rm -rf sh.o get_path.o mysh
+	rm -rf *.o myshell
