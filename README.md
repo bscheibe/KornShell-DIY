@@ -22,7 +22,7 @@ A personal implementation of the KornShell.
 
 ### TODO
 
-DONE: Ensure existing commands function.
+DONE: Ensure existing commands function.  
 DONE: Remove global variables.  
 Refactor commands to a separate file as function calls.  
 Refactor all commands for clarity and improve upon them.  
