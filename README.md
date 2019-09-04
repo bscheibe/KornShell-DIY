@@ -2,8 +2,8 @@
 
 A personal implementation of the KornShell.
 
-### Feature list
-```
+## Feature list
+
 cd : change directory. Pass no argument to change to the home directory. Pass '-' to change to previously visited location. Pass a relative path to set working directory.
 alias: creates an alias and stores it. Prints alias list if none given.
 exit: exits the shell.
@@ -18,12 +18,12 @@ printenv: prints environment. User may narrow this by passing a location to sear
 setenv: sets environment variables, or reads them if none given.
 exec: searches for an executable, and runs it if it exists.
 empty case: escapes and prints the prompt on a new line.
-```
 
-### TODO
-```
+
+## TODO
+
 Refactor bloated main method.
 Remove global variables.
 Refactor commands to a separate file.
 Plug memory leaks, if any.
-```
+
