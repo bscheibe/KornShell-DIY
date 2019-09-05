@@ -30,7 +30,7 @@ Refactor bloated main method.
 Plug memory leaks, if any.  
 DONE: Currently includes a provided get_path.c file, write our own instead.  
 (1/2): Add test cases and testing directory.  
-DONE: Update Makefile for clarity and add automatic testing.  
+(1/2): Update Makefile for clarity and add automatic testing.  
 DONE: Refactor file structure for clarity.  
 Add wildcard support.  
 Add piping.  
