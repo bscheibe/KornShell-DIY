@@ -16,7 +16,7 @@ A personal implementation of the KornShell.
 **prompt**: adds a prefix to the prompt with a given arg, asks for one if none given.  
 **printenv**: prints environment. User may narrow this by passing a location to search.  
 **setenv**: sets environment variables, or reads them if none given.  
-**exec**: searches for an executable, and runs it if it exists.  
+**--executable--**: searches for an executable, both in the current working directory and in the environment, and runs it if it exists.  
 **empty case**: escapes and prints the prompt on a new line.  
 
 
