@@ -24,9 +24,7 @@ A personal implementation of the KornShell.
 
 DONE: Ensure existing commands function.  
 DONE: Remove global variables.  
-Refactor commands to a separate file as function calls.  
 Refactor all commands for clarity and improve upon them.  
-Refactor bloated main method.  
 Plug memory leaks, if any.  
 DONE: Currently includes a provided get_path.c file, write our own instead.  
 (1/2): Add test cases and testing directory.  
@@ -34,4 +32,4 @@ DONE: Currently includes a provided get_path.c file, write our own instead.
 DONE: Refactor file structure for clarity.  
 Add wildcard support.  
 Add piping.  
-Add some additional commands : {grep, tree, ...}  
+Potentially add some additional commands : {grep, tree, ...}  
