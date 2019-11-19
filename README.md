@@ -20,7 +20,7 @@ A personal implementation of the KornShell.
 **empty case**: escapes and prints the prompt on a new line.  
 
 
-### Planned Features
+## Planned Features
 
 DONE: Ensure existing commands function.  
 DONE: Remove global variables.  
