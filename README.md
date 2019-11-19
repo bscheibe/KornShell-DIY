@@ -32,4 +32,4 @@ DONE: Currently includes a provided get_path.c file, write our own instead.
 DONE: Refactor file structure for clarity.  
 Add wildcard support.  
 Add piping.  
-Potentially add some additional commands : {grep, tree, ...}  
+Utility support : {grep, tree, ...}  
