@@ -2,7 +2,7 @@
 
 A personal implementation of the KornShell.
 
-## Feature list
+## Feature List
 
 **cd**: change directory. Pass no argument to change to the home directory. Pass '-' to change to previously visited location. Pass a relative path to set working directory.  
 **alias**: creates an alias and stores it. Prints alias list if none given.  
