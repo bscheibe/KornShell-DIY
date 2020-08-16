@@ -1,3 +1,6 @@
+#include "shell.h"
+#include "commands.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -9,10 +12,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "shell.h"
-#include "commands.h"
 
-char* which(char *command, struct pathelement *pathlist);
 
 int shell(int argc, char **argv, char **envp)
 {
@@ -383,21 +383,4 @@ int shell(int argc, char **argv, char **envp)
 		}
 	}
 	return 0;
-}
-
-char* which(char *command, struct pathelement *pathlist)
-{
-	char temp[256];
-	while (pathlist)
-	{
-		sprintf(temp, "%s/%s", pathlist->element, command);
-		if (access(temp, X_OK) == 0)
-		{
-			sprintf(command, "%s", temp);
-			return NULL;
-			//			return(command);
-		}
-		pathlist = pathlist->next;
-	}
-	return NULL;
 }

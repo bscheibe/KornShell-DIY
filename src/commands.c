@@ -7,6 +7,31 @@
 #include <pwd.h>
 
 #include "commands.h"
+#include "shell.h"
+
+int cd(char *rawpath)
+{
+	return 0;
+}
+
+
+char* which(char *command, struct pathelement *pathlist)
+{
+	char temp[256];
+	while (pathlist)
+	{
+		sprintf(temp, "%s/%s", pathlist->element, command);
+		if (access(temp, X_OK) == 0)
+		{
+			sprintf(command, "%s", temp);
+			return NULL;
+			//			return(command);
+		}
+		pathlist = pathlist->next;
+	}
+	return NULL;
+}
+
 
 struct pathelement *get_path()
 {
@@ -42,9 +67,4 @@ struct pathelement *get_path()
   } while ( p = strtok(NULL, ":") );
 
   return pathlist;
-} /* end get_path() */
-
-int cd(char *rawpath)
-{
-	return 0;
-}
+} 
