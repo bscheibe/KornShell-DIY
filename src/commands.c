@@ -7,7 +7,7 @@
 #include <pwd.h>
 
 #include "commands.h"
-#include "shell.h"
+#include "data.h"
 
 int cd(char *rawpath)
 {
